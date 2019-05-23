@@ -1,6 +1,7 @@
 const async = require('async');
 const Pool = require('./pool');
-const pool = Pool.init();
+const pool = Pool.pool;
+const logger = require('./logger');
 
 /**
  * 数据库模型
@@ -14,30 +15,34 @@ class DB {
     this.pool = pool;
   }
 
+  sqlLogger (sqlMod, idJson, rowInfo) {
+    logger.getLogger().sqlLogger(sqlMod, idJson, rowInfo);
+  }
+
   /**
    * 创建单个连接
    * @returns {Promise<any>}
    */
   getConnection() {
-    const { pool } = this
+    const { pool } = this;
     return new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
-        if (err) reject(err)
-        else resolve(connection)
+        if (err) reject(err);
+        else resolve(connection);
       })
     })
   }
 
   /**
    * 数据查询接口
-   * @param tableName
    * @param idJson
    * @returns {Promise<any>}
    */
   fetchRow(idJson) {
-    const { tableName, pool } = this
+    const { tableName, pool } = this;
     return new Promise((resolve, reject) => {
-      const sqlMod = `SELECT * FROM \`${tableName}\` WHERE ?`
+      const sqlMod = `SELECT * FROM \`${tableName}\` WHERE ?`;
+      this.sqlLogger(sqlMod, idJson);
       pool.query(sqlMod, idJson, function(error, results) {
         if (error) {
           reject(error)
@@ -58,9 +63,10 @@ class DB {
    */
 
   selectAll () {
-    const { tableName, pool } = this
+    const { tableName, pool } = this;
     return new Promise((resolve, reject) => {
-      const sqlMod = `SELECT * FROM \`${tableName}\``
+      const sqlMod = `SELECT * FROM \`${tableName}\``;
+      this.sqlLogger(sqlMod);
       pool.query(sqlMod, function (error, results) {
         if (error) {
           reject(error)
@@ -77,9 +83,10 @@ class DB {
    * @returns {Promise<any>}
    */
   fetchRows(idJson) {
-    const { tableName, pool } = this
+    const { tableName, pool } = this;
     return new Promise((resolve, reject) => {
-      const sqlMod = `SELECT * FROM \`${tableName}\` WHERE ?`
+      const sqlMod = `SELECT * FROM \`${tableName}\` WHERE ?`;
+      this.sqlLogger(sqlMod, idJson);
       pool.query(sqlMod, idJson, function (error, results) {
         if (error) {
           reject(error)
@@ -98,14 +105,15 @@ class DB {
    * @returns {Promise<any>}
    */
   fetchCols (cols, idJson) {
-    const { tableName, pool } = this
+    const { tableName, pool } = this;
     return new Promise((resolve, reject) => {
-      let colMod = ''
+      let colMod = '';
       cols.forEach(col => {
         colMod += `${col},`
-      })
-      colMod = colMod.replace(colMod[colMod.lastIndexOf(',')], '')
-      const sqlMod = `SELECT ${colMod} FROM \`${tableName}\` where ?`
+      });
+      colMod = colMod.replace(colMod[colMod.lastIndexOf(',')], '');
+      const sqlMod = `SELECT ${colMod} FROM \`${tableName}\` where ?`;
+      this.sqlLogger(sqlMod, idJson);
       pool.query(sqlMod, idJson, function (error, results) {
         if (error) {
           reject(error)
@@ -118,16 +126,16 @@ class DB {
 
   /**
    * 数据插入接口
-   * @param tableName
    * @param rowInfo
    * @returns {Promise<any>}
    */
   insert(rowInfo) {
-    const { tableName, pool } = this
+    const { tableName, pool } = this;
     return new Promise((resolve, reject) => {
-      const sqlMod = `INSERT INTO \`${tableName}\` SET ?`
+      const sqlMod = `INSERT INTO \`${tableName}\` SET ?`;
+      this.sqlLogger(sqlMod, rowInfo);
       pool.query(sqlMod, rowInfo, function(error, result) {
-        if (error) reject(error)
+        if (error) reject(error);
         else resolve(result)
       })
     })
@@ -141,12 +149,13 @@ class DB {
    * @returns {Promise<any>}
    */
   update(idJson, rowInfo) {
-    const { tableName, pool } = this
-    console.log(rowInfo)
+    const { tableName, pool } = this;
+    console.log(rowInfo);
     return new Promise((resolve, reject) => {
-      const sqlMod = `UPDATE \`${tableName}\` SET ? WHERE ?`
+      const sqlMod = `UPDATE \`${tableName}\` SET ? WHERE ?`;
+      this.sqlLogger(sqlMod, rowInfo, idJson);
       pool.query(sqlMod, [rowInfo, idJson], function (error, result) {
-        if (error) reject(error)
+        if (error) reject(error);
         else resolve(result)
       })
     })
@@ -154,16 +163,16 @@ class DB {
 
   /**
    * 数据删除接口
-   * @param tableName
    * @param idJson
    * @returns {Promise<any>}
    */
   remove(idJson) {
-    const { tableName, pool } = this
+    const { tableName, pool } = this;
     return new Promise((resolve, reject) => {
-      const sqlMod = `DELETE FROM \`${tableName}\` WHERE ?`
+      const sqlMod = `DELETE FROM \`${tableName}\` WHERE ?`;
+      this.sqlLogger(sqlMod, idJson);
       pool.query(sqlMod, idJson, function (error, result) {
-        if (error) reject(error)
+        if (error) reject(error);
         else resolve(result)
       })
     })
@@ -175,11 +184,12 @@ class DB {
    * @returns {Promise<any>}
    */
   count(idJson) {
-    const { tableName, pool } = this
+    const { tableName, pool } = this;
     return new Promise((resolve, reject) => {
-      const sqlMod = `SELECT COUNT(*) as count FROM \`${tableName}\` WHERE ?`
+      const sqlMod = `SELECT COUNT(*) as count FROM \`${tableName}\` WHERE ?`;
+      this.sqlLogger(sqlMod, idJson);
       pool.query(sqlMod, idJson, function (error, result) {
-        if (error) reject(error)
+        if (error) reject(error);
         else resolve(result.pop())
       })
     })
@@ -187,12 +197,13 @@ class DB {
 
   /**
    * 自定义查询
-   * @param sql
+   * @param sqlMod
    * @returns {Promise<any>}
    */
   queryStr(sqlMod) {
-    const { pool } = this
+    const { pool } = this;
     return new Promise((resolve, reject) => {
+      this.sqlLogger(sqlMod);
       pool.query(sqlMod, function (error, result) {
         if (error) {
           reject(error)
@@ -205,7 +216,6 @@ class DB {
 
   /**
    * 复合查询
-   * @param tableName
    * @param whereJson
    * @param orderByJson
    * @param limitArr
@@ -213,34 +223,33 @@ class DB {
    * @returns {Promise<any>}
    */
   fetchAll(select, whereJson, groupBy = '', orderByJson = '', limitArr = '') {
-    const { tableName, pool } = this
-    const andWhere = whereJson['and']
-    const orWhere = whereJson['or']
-    const betArr = whereJson['between']
-    const andArr = []
-    const orArr = []
+    const { tableName, pool } = this;
+    const andWhere = whereJson['and'];
+    const orWhere = whereJson['or'];
+    const betArr = whereJson['between'];
+    const andArr = [];
+    const orArr = [];
 
     for(const key in andWhere) {
-      const snap = typeof andWhere[key] === 'string' ? '\"' : ''
+      const snap = typeof andWhere[key] === 'string' ? '\"' : '';
       andArr.push(`\`${key}\` = ${snap}${andWhere[key]}${snap}`)
     }
     for(const key in orWhere) {
-      const snap = typeof andWhere[key] === 'string' ? '\"' : ''
+      const snap = typeof andWhere[key] === 'string' ? '\"' : '';
       orArr.push(`\`${key}\` = ${snap}${orWhere[key]}${snap}`)
     }
 
-    const andStr = andArr.join(' and ')
+    const andStr = andArr.join(' and ');
     const orStr = orArr.join(' or ')
-    const betStr = betArr ? `AND ${betArr[0]} BETWEEN ${betArr[1]} AND ${betArr[2]}` : ''
-    const selectStr = select.join(',')
+    const betStr = betArr ? `AND ${betArr[0]} BETWEEN ${betArr[1]} AND ${betArr[2]}` : '';
+    const selectStr = select.join(',');
 
-    const orderStr = orderByJson['type'] ? `order by ${orderByJson['key']} ${orderByJson['type']}` : ''
-    const limitStr = limitArr.length > 0 ? `limit ${limitArr.join(',')}` : ''
-    const groupStr = groupBy.length > 0 ? `group by ${groupBy.join(',')}` : ''
-    const sqlMod = `SELECT ${selectStr} FROM \`${tableName}\` WHERE ${andStr} ${orStr} ${betStr} ${orderStr} ${limitStr} ${groupStr}`
+    const orderStr = orderByJson['type'] ? `order by ${orderByJson['key']} ${orderByJson['type']}` : '';
+    const limitStr = limitArr.length > 0 ? `limit ${limitArr.join(',')}` : '';
+    const groupStr = groupBy.length > 0 ? `group by ${groupBy.join(',')}` : '';
+    const sqlMod = `SELECT ${selectStr} FROM \`${tableName}\` WHERE ${andStr} ${orStr} ${betStr} ${orderStr} ${limitStr} ${groupStr}`;
 
-    console.log(sqlMod)
-
+    this.sqlLogger(sqlMod);
     return new Promise((resolve, reject) => {
       pool.query(sqlMod, function (error, results) {
         if (error) {
@@ -252,7 +261,7 @@ class DB {
 
   connectionQuery(connection, sql, callback) {
     connection.query(sql, function (err, result) {
-      if (err) callback(err, null)
+      if (err) callback(err, null);
       else callback(null, result)
     })
   }
@@ -261,7 +270,7 @@ class DB {
     return new Promise((resolve, reject) => {
       connection.beginTransaction(err => {
         if (err) {
-          reject(err)
+          reject(err);
           return
         }
         async.series(tasks, (error, result) => {
@@ -275,7 +284,7 @@ class DB {
   commit(connection) {
     return new Promise((resolve, reject) => {
       connection.commit(err => {
-        if (err) reject(err)
+        if (err) reject(err);
         else resolve(connection)
       })
     })
@@ -284,11 +293,11 @@ class DB {
   rollback(connection) {
     return new Promise(resolve => {
       connection.rollback(() => {
-        connection.release()
+        connection.release();
         resolve()
       })
     })
   }
 }
 
-module.exports = DB
+module.exports = DB;

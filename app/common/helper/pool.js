@@ -1,14 +1,15 @@
-const mysql = require('mysql')
-const config = require('../config/mysql.config')
+const mysql = require('mysql');
+const config = require('../config/mysql.config');
+
 
 class Pool {
   constructor () {
-    this.pool = this.init()
+    this.pool = this.init();
   }
 
   init () {
-    return mysql.createPool(config)
+    return mysql.createPool(config);
   }
 }
 
-module.exports = new Pool()
+module.exports = new Pool();
