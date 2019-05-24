@@ -1,8 +1,11 @@
 const router = require('koa-router')()
 const action = require('../action/user.action')
-const scoreAction = require('../action/score.action')
 const info = require('../utils/info')
 const DateFmt = require('../utils/date')
+const interceptor = require('../common/helper/interceptor')
+
+router.use(interceptor)
+
 
 router.prefix('/api/user')
 

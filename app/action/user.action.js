@@ -17,6 +17,11 @@ const action = {
     delete result.password
     return result
   },
+  async getUserByRealId (id) {
+    let result = await userModel.getUserByRealId(id)
+    delete result.password
+    return result
+  },
   async checkInfo (id) {
     let result = await userModel.getUserById(id)
     return JSON.stringify(result) !== '{}'

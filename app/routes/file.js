@@ -1,6 +1,9 @@
 const router = require('koa-router')(); // "koa-router": "^7.2.0"
 const send = require('koa-send'); // "koa-send": "^4.1.0"
 const action = require('../action/file.action')
+const interceptor = require('../common/helper/interceptor')
+
+router.use(interceptor)
 
 router.prefix('/api/download')
 

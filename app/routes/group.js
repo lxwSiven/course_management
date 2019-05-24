@@ -1,6 +1,9 @@
 const router = require('koa-router')()
 const action = require('../action/group.action')
 const info = require('../utils/info')
+const interceptor = require('../common/helper/interceptor')
+
+router.use(interceptor)
 
 router.prefix('/api/group')
 

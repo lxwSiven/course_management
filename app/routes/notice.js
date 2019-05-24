@@ -1,6 +1,9 @@
 const router = require('koa-router')()
 const action = require('../action/notice.action')
 const info = require('../utils/info')
+const interceptor = require('../common/helper/interceptor')
+
+router.use(interceptor)
 
 router.prefix('/api/notice')
 
@@ -19,6 +22,7 @@ router.get('/', async (ctx, next) => {
   if (data) {
     ctx.body = info(200, 'notices/ok', data)
     // ctx.body = info(404, 'notice/fail', {})
+    // ctx.body = ctx
     ctx.cookies.set('session', '12989')
     return
   } else ctx.throw('获取所有公告失败', 400)

@@ -24,6 +24,13 @@ const model = DB => {
         console.error(e)
       }
     },
+    async getUserByRealId (id) {
+      try {
+        return fmtData(await DB.fetchRow({id: id}))
+      } catch (e) {
+        console.error(e)
+      }
+    },
     async updatePassword (id, password) {
       return fmtData(await DB.update({user_id: id}, {password: password}))
     },
