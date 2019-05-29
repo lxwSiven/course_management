@@ -5,7 +5,6 @@ const userAction = require('../../action/user.action')
 
 // 序列化，写入session(redis中)
 passport.serializeUser((user, done) => {
-  console.log('serializeUser:', user)
   if (user.id) {
     done(null, user.id)
   } else {
@@ -15,19 +14,15 @@ passport.serializeUser((user, done) => {
 
 // 反序列化，session中是否存在
 passport.deserializeUser(async (id, done) => {
-  console.log('deserializeUser:', id)
   let user = await userAction.getUserByRealId(id)
   delete user.password
-  console.log(user)
   done(null, user)
-  // return
 })
 
 passport.use(new LocalStrategy({
   usernameField: 'user_id',
   passwordField: 'password'
 }, async (userId, password, done) => {
-  console.log('LocalStrategy:', userId, password)
   let checkUserId = await userAction.checkInfo(userId)
   if (!checkUserId) {
     done(null, {}, {msg: '账号不存在', code: 401})

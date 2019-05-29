@@ -162,28 +162,27 @@ const action = {
     // 要退组的是小组长
     // 两种情况； 1、小组只有组长一人。2、有其他成员
     // 第二中情况从小组成员中选一人作为新的组长
-    // if (isLeader) {
-    //   let members = await stuCourseModel.getStudentsByGroupId(groupId)
-    //   if (members.length) {
-    //     rowInfo.group_leader = members[0].stu_id
-    //   } else {
-    //     rowInfo.group_leader = null
-    //   }
-    // }
-    // // 修改group表和 stuCourse 表
-    // await groupModel.quitGroup(groupId, rowInfo)
-    // await stuCourseModel.quitGroup(courseId, userId, rowInfo.group_leader)
-    // return 'ok'
+    if (isLeader) {
+      let members = await stuCourseModel.getStudentsByGroupId(groupId)
+      if (members.length) {
+        rowInfo.group_leader = members[0].stu_id
+      } else {
+        rowInfo.group_leader = null
+      }
+    }
+    // 修改group表和 stuCourse 表
+    await groupModel.quitGroup(groupId, rowInfo)
+    await stuCourseModel.quitGroup(courseId, userId, rowInfo.group_leader)
+    return 'ok'
 
     // 要退的是小组长，则删除小组。
-
-    if (isLeader) {
-      this.deleteGroup(courseId, groupId)
-    } else {
-      await groupModel.quitGroup(groupId, rowInfo)
-      await stuCourseModel.quitGroup(courseId, userId)
-    }
-    return 'ok'
+    // if (isLeader) {
+    //   this.deleteGroup(courseId, groupId)
+    // } else {
+    //   await groupModel.quitGroup(groupId, rowInfo)
+    //   await stuCourseModel.quitGroup(courseId, userId)
+    // }
+    // return 'ok'
   },
 
   /**

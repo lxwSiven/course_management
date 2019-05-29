@@ -119,6 +119,9 @@ function cryptSession (hash) {
 async function startReply (msg, wss) {
   let groupInfo = {}
   let groups = await groupAction.getGroups(msg.info.courseId)
+  groups = groups.map(group => {
+    return group.member_num > 0
+  })
   groupInfo.unReply = groups
   groupInfo.hasReply = []
   // groups被分为3部分，一是还未答辩小组，二是已答辩小组，三是当前答辩小组

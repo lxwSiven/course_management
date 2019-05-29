@@ -59,10 +59,16 @@ const model = DB => {
         console.error(e)
       }
     },
-    async quitGroup (courseId, userId) {
+    async quitGroup (courseId, userId, leaderId) {
+      console.log(userId, leaderId)
+      let sql
+      if (leaderId) {
+        sql = `update stu_course set is_groupleader = 1 where course_id = ${courseId} and stu_id = ${leaderId}`
+      }
       let sqlMode = `update stu_course set is_in_team = 2, team_id = null, is_groupleader = 2 where course_id = ${courseId}
                      and stu_id = ${userId}`
       try {
+        if (sql) await DB.queryStr(sql)
         return fmtData(await DB.queryStr(sqlMode))
       } catch (e) {
         console.error(e)
