@@ -34,7 +34,7 @@
     "mysql": "^2.15.0",
     "nodemailer": "^4.7.0",
     "promise-queue-plus": "^1.1.0",
-    "pug": "^2.0.0-rc.1",
+    "pug": "^3.0.1",
     "qcloudsms_js": "^0.1.0",
     "redis": "^2.8.0",
     "string-random": "^0.1.0",
