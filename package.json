@@ -36,7 +36,7 @@
     "promise-queue-plus": "^1.1.0",
     "pug": "^2.0.0-rc.1",
     "qcloudsms_js": "^0.1.0",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "string-random": "^0.1.0",
     "ws": "^6.2.1",
     "koa-passport": "^4.1.3",
