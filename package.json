@@ -30,7 +30,7 @@
     "koa2-cors": "^2.0.5",
     "koa2-session-redis": "0.0.2",
     "log4js": "^3.0.6",
-    "moment": "^2.22.2",
+    "moment": "^2.29.2",
     "mysql": "^2.15.0",
     "nodemailer": "^4.7.0",
     "promise-queue-plus": "^1.1.0",
